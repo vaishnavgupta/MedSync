@@ -3,6 +3,7 @@ package com.vaishnav.medsync.users.service;
 import com.vaishnav.medsync.users.entity.User;
 import com.vaishnav.medsync.users.io.LoginRequestDto;
 import com.vaishnav.medsync.users.io.RegisterRequestDto;
+import com.vaishnav.medsync.users.io.UserResponseDto;
 import com.vaishnav.medsync.users.repository.UserRepository;
 import com.vaishnav.medsync.users.security.jwt.JwtAuthResponse;
 import com.vaishnav.medsync.users.security.jwt.JwtUtils;
@@ -91,5 +92,52 @@ public class UserService {
     }
 
 
+    public UserResponseDto getUserFromJwt(String token) {
+        String email = jwtUtils.getUsernameFromJWT(token);
 
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User does not exists"));
+
+        return UserResponseDto.builder()
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .dob(user.getDob())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
+    }
+
+    public UserResponseDto updateUserFromJwt(String token, UserResponseDto requestDto) {
+        String email = jwtUtils.getUsernameFromJWT(token);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User does not exists"));
+
+        user.setPhone(requestDto.getPhone());
+        user.setFullName(requestDto.getFullName());
+        user.setDob(requestDto.getDob());
+
+        User savedUser = userRepository.save(user);
+
+        return UserResponseDto.builder()
+                .email(savedUser.getEmail())
+                .fullName(savedUser.getFullName())
+                .dob(savedUser.getDob())
+                .phone(savedUser.getPhone())
+                .role(savedUser.getRole())
+                .build();
+    }
+
+    public UserResponseDto getUserByEmail(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User does not exists"));
+
+        return UserResponseDto.builder()
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .dob(user.getDob())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
+    }
 }
