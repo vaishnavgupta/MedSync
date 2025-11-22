@@ -21,7 +21,7 @@ public class MailVerificationService {
     public void sendVerificationEmail(String to, String otp){
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(to);
-        msg.setFrom("vaishnav23oct@gmail.com");
+        msg.setFrom("continumm.films2310@gmail.com");
         msg.setSubject("Verify your MedSync Account");
         msg.setText("Your OTP for email verification is: " + otp + "\nThis OTP is valid for 10 minutes.");
         javaMailSender.send(msg);

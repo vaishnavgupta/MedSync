@@ -7,6 +7,7 @@ import com.vaishnav.medsync.users.io.UserResponseDto;
 import com.vaishnav.medsync.users.repository.UserRepository;
 import com.vaishnav.medsync.users.security.jwt.JwtAuthResponse;
 import com.vaishnav.medsync.users.security.jwt.JwtUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +31,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final MailVerificationService mailService;
 
+    @Transactional
     public User registerUser(RegisterRequestDto requestDto){
         User user =  new User();
         user.setEmail(requestDto.getEmail());

@@ -12,10 +12,13 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +38,12 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public MultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
+    }
+
+
+    @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(){
         DaoAuthenticationProvider daoAuthPr = new DaoAuthenticationProvider();
         daoAuthPr.setUserDetailsService(userDetailsServiceImpl);
@@ -52,10 +61,16 @@ public class WebSecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                        .requestMatchers("api/auth/**").permitAll()
-                        .requestMatchers("api/user/**").authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/prescriptions/upload").authenticated()
+                        .requestMatchers("/api/patient/**").authenticated()
+                        .requestMatchers("/api/doctors/**").authenticated()
                         .anyRequest().authenticated()
                 );
+        http.sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
         http.authenticationProvider(daoAuthenticationProvider());
         http.addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);          //Adds Our Custom Filter Before UsernamePassAuthFilter
         return http.build();
